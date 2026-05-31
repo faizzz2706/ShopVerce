@@ -15,13 +15,12 @@ export default function Login() {
     e.preventDefault();
     dispatch(clearError());
     try {
-      const user = await dispatch(loginUser(form)).unwrap();
+      await dispatch(loginUser(form)).unwrap();
       toast.success("Welcome back!");
       const from = location.state?.from?.pathname;
-      if (user.role === "ADMIN") navigate("/admin");
-      else navigate(from || "/");
+      navigate(from && from !== "/login" ? from : "/");
     } catch (err) {
-      toast.error(err || "Login failed");
+      toast.error(err || "Invalid email or password");
     }
   };
 
@@ -60,9 +59,6 @@ export default function Login() {
         <Link to="/register" className="text-primary-600 hover:underline">
           Sign up
         </Link>
-      </p>
-      <p className="mt-2 text-center text-xs text-gray-500">
-        Demo: admin@shopverse.com / customer1@shopverse.com — Password@123
       </p>
     </AuthLayout>
   );

@@ -25,10 +25,26 @@ const processQueue = (error, token = null) => {
   failedQueue = [];
 };
 
+/** Login/register 401s must not trigger refresh or redirect */
+function isPublicAuthRequest(url) {
+  if (!url) return false;
+  const path = String(url);
+  return (
+    path.includes("/auth/login") ||
+    path.includes("/auth/register") ||
+    path.includes("/auth/forgot-password") ||
+    path.includes("/auth/reset-password")
+  );
+}
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+
+    if (error.response?.status === 401 && isPublicAuthRequest(originalRequest?.url)) {
+      return Promise.reject(error);
+    }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
