@@ -3,6 +3,14 @@ import { AppError } from "../middleware/errorHandler.js";
 import { getPagination, paginatedResponse } from "../utils/pagination.js";
 import { updateProductRating } from "./review.controller.js";
 
+function slugify(text) {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
 export async function getDashboardStats(req, res) {
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
@@ -412,19 +420,64 @@ export async function updateCoupon(req, res) {
 
 export async function adminGetCategories(req, res) {
   const categories = await prisma.category.findMany({
-    include: { subCategories: true },
+    where: { deletedAt: null },
+    include: {
+      subCategories: {
+        where: { deletedAt: null },
+        orderBy: { name: "asc" },
+      },
+    },
     orderBy: { name: "asc" },
   });
   res.json({ success: true, data: categories });
 }
 
 export async function createCategory(req, res) {
-  const category = await prisma.category.create({ data: req.body });
+  const { name, description, image } = req.body;
+  if (!name?.trim()) throw new AppError("Category name is required", 400);
+
+  const slug = slugify(name);
+  const existing = await prisma.category.findFirst({
+    where: { deletedAt: null, OR: [{ slug }, { name: name.trim() }] },
+  });
+  if (existing) throw new AppError("Category already exists", 409);
+
+  const category = await prisma.category.create({
+    data: {
+      name: name.trim(),
+      slug,
+      description: description?.trim() || null,
+      image: image?.trim() || null,
+    },
+  });
   res.status(201).json({ success: true, data: category });
 }
 
 export async function createSubCategory(req, res) {
-  const sub = await prisma.subCategory.create({ data: req.body });
+  const { categoryId, name, description, image } = req.body;
+  if (!categoryId) throw new AppError("Category is required", 400);
+  if (!name?.trim()) throw new AppError("Subcategory name is required", 400);
+
+  const category = await prisma.category.findFirst({
+    where: { id: categoryId, deletedAt: null },
+  });
+  if (!category) throw new AppError("Category not found", 404);
+
+  const slug = slugify(name);
+  const existing = await prisma.subCategory.findFirst({
+    where: { categoryId, deletedAt: null, slug },
+  });
+  if (existing) throw new AppError("Subcategory already exists in this category", 409);
+
+  const sub = await prisma.subCategory.create({
+    data: {
+      categoryId,
+      name: name.trim(),
+      slug,
+      description: description?.trim() || null,
+      image: image?.trim() || null,
+    },
+  });
   res.status(201).json({ success: true, data: sub });
 }
 

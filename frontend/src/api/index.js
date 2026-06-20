@@ -86,6 +86,8 @@ export const adminApi = {
   coupons: () => api.get("/admin/coupons"),
   createCoupon: (data) => api.post("/admin/coupons", data),
   categories: () => api.get("/admin/categories"),
+  createCategory: (data) => api.post("/admin/categories", data),
+  createSubCategory: (data) => api.post("/admin/subcategories", data),
   banners: () => api.get("/admin/banners"),
   createBanner: (data) => api.post("/admin/banners", data),
 };

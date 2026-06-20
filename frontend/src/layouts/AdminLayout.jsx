@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   LayoutDashboard,
   Package,
+  FolderTree,
   Users,
   ShoppingBag,
   Tag,
@@ -17,6 +18,7 @@ import { toggleAdminSidebar, closeAdminSidebar } from "../store/uiSlice";
 const links = [
   { to: "/admin", icon: LayoutDashboard, label: "Dashboard", end: true },
   { to: "/admin/products", icon: Package, label: "Products" },
+  { to: "/admin/categories", icon: FolderTree, label: "Categories" },
   { to: "/admin/orders", icon: ShoppingBag, label: "Orders" },
   { to: "/admin/users", icon: Users, label: "Users" },
   { to: "/admin/reviews", icon: Star, label: "Reviews" },

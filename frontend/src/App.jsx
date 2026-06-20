@@ -32,6 +32,7 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminReviews from "./pages/admin/AdminReviews";
 import AdminCoupons from "./pages/admin/AdminCoupons";
 import AdminBanners from "./pages/admin/AdminBanners";
+import AdminCategories from "./pages/admin/AdminCategories";
 
 function AppInitializer() {
   const dispatch = useDispatch();
@@ -144,6 +145,7 @@ export default function App() {
           >
             <Route index element={<AdminDashboard />} />
             <Route path="products" element={<AdminProducts />} />
+            <Route path="categories" element={<AdminCategories />} />
             <Route path="orders" element={<AdminOrders />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="reviews" element={<AdminReviews />} />
