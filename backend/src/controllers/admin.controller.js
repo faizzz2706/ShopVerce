@@ -127,13 +127,6 @@ export async function deleteUser(req, res) {
   res.json({ success: true, message: "User soft deleted" });
 }
 
-function slugify(text) {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
-
 function parseProductData(body) {
   const {
     name,
