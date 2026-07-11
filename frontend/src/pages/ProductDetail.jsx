@@ -29,6 +29,28 @@ export default function ProductDetail() {
       .finally(() => setLoading(false));
   }, [slug]);
 
+  const [zoomStyle, setZoomStyle] = useState({
+    transformOrigin: "center center",
+    transform: "scale(1)",
+  });
+
+  const handleMouseMove = (e) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+    setZoomStyle({
+      transformOrigin: `${x}% ${y}%`,
+      transform: "scale(1.5)",
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setZoomStyle({
+      transformOrigin: "center center",
+      transform: "scale(1)",
+    });
+  };
+
   if (loading) return <PageSkeleton />;
   if (!data) return <p className="p-8 text-center">Product not found</p>;
 
@@ -44,11 +66,16 @@ export default function ProductDetail() {
     <div className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-6">
       <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
         <div>
-          <div className="aspect-square overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-800">
+          <div 
+            className="relative aspect-square overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-800 cursor-zoom-in"
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+          >
             <img
               src={product.images[selectedImage]?.url}
               alt={product.name}
-              className="h-full w-full object-cover"
+              style={zoomStyle}
+              className="h-full w-full object-cover transition-transform duration-100 ease-out"
             />
           </div>
           <div className="mt-4 flex gap-2 overflow-x-auto">
